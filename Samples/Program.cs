@@ -26,7 +26,7 @@ namespace MySample
                 //ModbusTcpMasterReadInputs();
                 //StartModbusAsciiSlave();
                 //ModbusTcpMasterReadInputsFromModbusSlave();
-                //ModbusSerialAsciiMasterReadRegistersFromModbusSlave();
+                ModbusSerialAsciiMasterReadRegistersFromModbusSlave();
                 //StartModbusTcpSlave();
                 //StartModbusUdpSlave();
                 //StartModbusAsciiSlave();
@@ -44,7 +44,7 @@ namespace MySample
         /// </summary>
         public static void ModbusSerialRtuMasterWriteRegisters()
         {
-            using (SerialPort port = new SerialPort("COM1"))
+            using (SerialPort port = new SerialPort("COM11"))
             {
                 // configure serial port
                 port.BaudRate = 9600;
@@ -71,7 +71,7 @@ namespace MySample
         /// </summary>
         public static void ModbusSerialAsciiMasterReadRegisters()
         {
-            using (SerialPort port = new SerialPort("COM1"))
+            using (SerialPort port = new SerialPort("COM11"))
             {
                 // configure serial port
                 port.BaudRate = 9600;
@@ -157,7 +157,7 @@ namespace MySample
         /// </summary>
         public static void StartModbusSerialAsciiSlave()
         {
-            using (SerialPort slavePort = new SerialPort("COM2"))
+            using (SerialPort slavePort = new SerialPort("COM12"))
             {
                 // configure serial port
                 slavePort.BaudRate = 9600;
@@ -182,7 +182,7 @@ namespace MySample
         /// </summary>
         public static void StartModbusSerialRtuSlave()
         {
-            using (SerialPort slavePort = new SerialPort("COM2"))
+            using (SerialPort slavePort = new SerialPort("COM12"))
             {
                 // configure serial port
                 slavePort.BaudRate = 9600;
@@ -304,8 +304,8 @@ namespace MySample
         /// </summary>
         public static void ModbusSerialAsciiMasterReadRegistersFromModbusSlave()
         {
-            using (SerialPort masterPort = new SerialPort("COM1"))
-            using (SerialPort slavePort = new SerialPort("COM2"))
+            using (SerialPort masterPort = new SerialPort("COM11"))
+            using (SerialPort slavePort = new SerialPort("COM12"))
             {
                 // configure serial ports
                 masterPort.BaudRate = slavePort.BaudRate = 9600;
@@ -320,7 +320,7 @@ namespace MySample
                 byte slaveId = 1;
                 ModbusSlave slave = ModbusSerialSlave.CreateAscii(slaveId, slaveAdapter);
                 var listenTask = slave.ListenAsync();
-
+                
                 var masterAdapter = new SerialPortAdapter(masterPort);
                 // create modbus master
                 ModbusSerialMaster master = ModbusSerialMaster.CreateAscii(masterAdapter);
@@ -328,6 +328,8 @@ namespace MySample
                 master.Transport.Retries = 5;
                 ushort startAddress = 100;
                 ushort numRegisters = 5;
+
+                master.WriteMultipleRegisters(slaveId, 100, new ushort[] {1, 2, 3, 4, 5});
 
                 // read five register values
                 ushort[] registers = master.ReadHoldingRegisters(slaveId, startAddress, numRegisters);
@@ -351,7 +353,7 @@ namespace MySample
         /// </summary>
         public static void ReadWrite32BitValue()
         {
-            using (SerialPort port = new SerialPort("COM1"))
+            using (SerialPort port = new SerialPort("COM11"))
             {
                 // configure serial port
                 port.BaudRate = 9600;
