@@ -22,11 +22,15 @@ namespace MySample
                 //ModbusTcpMasterReadInputs();
                 //SimplePerfTest();
                 //ModbusSerialRtuMasterWriteRegisters();
+                
                 //ModbusSerialAsciiMasterReadRegisters();
+                
                 //ModbusTcpMasterReadInputs();
                 //StartModbusAsciiSlave();
                 //ModbusTcpMasterReadInputsFromModbusSlave();
+                
                 ModbusSerialAsciiMasterReadRegistersFromModbusSlave();
+                
                 //StartModbusTcpSlave();
                 //StartModbusUdpSlave();
                 //StartModbusAsciiSlave();
@@ -74,8 +78,8 @@ namespace MySample
             using (SerialPort port = new SerialPort("COM11"))
             {
                 // configure serial port
-                port.BaudRate = 9600;
-                port.DataBits = 8;
+                port.BaudRate = 38400;
+                port.DataBits = 7;
                 port.Parity = Parity.None;
                 port.StopBits = StopBits.One;
                 port.Open();
@@ -84,16 +88,18 @@ namespace MySample
                 // create modbus master
                 IModbusSerialMaster master = ModbusSerialMaster.CreateAscii(adapter);
 
-                byte slaveId = 1;
-                ushort startAddress = 1;
-                ushort numRegisters = 5;
+                byte slaveId = 2;
+                ushort startAddress = 0x00;
+                ushort numRegisters = 100;
 
                 // read five registers		
-                ushort[] registers = master.ReadHoldingRegisters(slaveId, startAddress, numRegisters);
-
+                //ushort[] registers = master.ReadHoldingRegisters(slaveId, startAddress, numRegisters);
+                ushort[] registers = master.ReadInputRegisters(slaveId, startAddress, numRegisters);
+                
                 for (int i = 0; i < numRegisters; i++)
                 {
-                    Console.WriteLine($"Register {startAddress + i}={registers[i]}");
+                    //Console.WriteLine($"Register {startAddress + i}={registers[i]}");
+                    Console.WriteLine($"Register {startAddress + i}={i}");
                 }
             }
 
@@ -317,7 +323,7 @@ namespace MySample
 
                 var slaveAdapter = new SerialPortAdapter(slavePort);
                 // create modbus slave on seperate thread
-                byte slaveId = 1;
+                byte slaveId = 2;
                 ModbusSlave slave = ModbusSerialSlave.CreateAscii(slaveId, slaveAdapter);
                 var listenTask = slave.ListenAsync();
                 
@@ -326,7 +332,7 @@ namespace MySample
                 ModbusSerialMaster master = ModbusSerialMaster.CreateAscii(masterAdapter);
 
                 master.Transport.Retries = 5;
-                ushort startAddress = 100;
+                ushort startAddress = 0;
                 ushort numRegisters = 5;
 
                 master.WriteMultipleRegisters(slaveId, 100, new ushort[] {1, 2, 3, 4, 5});
