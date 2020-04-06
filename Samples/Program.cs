@@ -21,7 +21,7 @@ namespace MySample
             {
                 //ModbusTcpMasterReadInputs();
                 //SimplePerfTest();
-                //ModbusSerialRtuMasterWriteRegisters();
+                ModbusSerialRtuMaster();
                 
                 //ModbusSerialAsciiMasterReadRegisters();
                 
@@ -29,7 +29,7 @@ namespace MySample
                 //StartModbusAsciiSlave();
                 //ModbusTcpMasterReadInputsFromModbusSlave();
                 
-                ModbusSerialAsciiMasterReadRegistersFromModbusSlave();
+                //ModbusSerialAsciiMasterReadRegistersFromModbusSlave();
                 
                 //StartModbusTcpSlave();
                 //StartModbusUdpSlave();
@@ -46,7 +46,7 @@ namespace MySample
         /// <summary>
         ///     Simple Modbus serial RTU master write holding registers example.
         /// </summary>
-        public static void ModbusSerialRtuMasterWriteRegisters()
+        public static void ModbusSerialRtuMaster()
         {
             using (SerialPort port = new SerialPort("COM11"))
             {
@@ -61,12 +61,19 @@ namespace MySample
                 // create modbus master
                 IModbusSerialMaster master = ModbusSerialMaster.CreateRtu(adapter);
 
-                byte slaveId = 1;
-                ushort startAddress = 100;
+                byte slaveId = 0x01;
+                ushort startAddress = 0x0000;
                 ushort[] registers = new ushort[] { 1, 2, 3 };
 
                 // write three registers
-                master.WriteMultipleRegisters(slaveId, startAddress, registers);
+                //master.WriteMultipleRegisters(slaveId, startAddress, registers);
+                //ushort[] usValues = master.ReadInputRegisters(slaveId, startAddress, 1);
+                master.WriteSingleCoil(slaveId, startAddress, false);
+                bool[] usValues = master.ReadCoils(slaveId, startAddress, 1);
+                for (int i=0; i< usValues.Length; i++)
+                {
+                    Console.WriteLine(usValues[i].ToString());
+                }
             }
         }
 
